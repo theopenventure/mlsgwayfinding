@@ -82,7 +82,7 @@ export default function InfoModal({ onClose }) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       {/* Desktop: side-by-side; Mobile: full-screen stacked */}
-      <div className="relative w-full md:w-auto md:max-w-[1160px] h-screen md:h-[600px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row">
+      <div className="relative w-full md:w-auto md:max-w-[1044px] h-screen md:h-[540px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row">
         {/* Mobile-only mint top */}
         <div
           className="md:hidden flex-1 relative"
@@ -124,7 +124,7 @@ export default function InfoModal({ onClose }) {
         {/* Desktop left: navy text panel */}
         <div
           className="hidden md:flex flex-col justify-between bg-heading text-white pl-14 pr-6 py-14 rounded-l-2xl"
-          style={{ width: '550px', height: '600px' }}
+          style={{ width: '495px', height: '540px' }}
         >
           <p className="text-[17px] text-white/70 tracking-[-0.02em]">{index + 1}/{slides.length}</p>
           <div className="flex flex-col gap-4 max-w-[470px]">
@@ -150,7 +150,7 @@ export default function InfoModal({ onClose }) {
         {/* Desktop right: mint panel with close button */}
         <div
           className="hidden md:block relative rounded-r-2xl"
-          style={{ backgroundColor: MINT, width: '610px', height: '600px' }}
+          style={{ backgroundColor: MINT, width: '549px', height: '540px' }}
         >
           <button
             onClick={onClose}
