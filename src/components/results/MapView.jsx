@@ -95,21 +95,25 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
     ]
   }, [providers])
 
-  // Track which marker IDs we've already seen so we only pin-drop newcomers
-  const seenIdsRef = useRef(new Set())
+  // Track which marker IDs have already played their drop animation, so the
+  // pin-drop only runs for genuine newcomers (not on every re-render caused
+  // by hover/select state changes).
+  const droppedIdsRef = useRef(new Set())
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  const isFirstRenderRef = useRef(true)
-  const newcomerIndexMap = useMemo(() => {
-    const map = new Map()
-    let newcomerIdx = 0
-    providers.forEach(p => {
-      if (!seenIdsRef.current.has(p.id)) {
-        map.set(p.id, newcomerIdx++)
-      }
-    })
-    // Add to seen for next render
-    providers.forEach(p => seenIdsRef.current.add(p.id))
-    return map
+
+  // Compute newcomers BEFORE marking them as dropped (so we use the previous
+  // ref state for this render, then commit-mark them after).
+  const newcomerStaggerMap = new Map()
+  let newcomerIdx = 0
+  providers.forEach(p => {
+    if (!droppedIdsRef.current.has(p.id)) {
+      newcomerStaggerMap.set(p.id, newcomerIdx++)
+    }
+  })
+
+  // After commit, mark current providers as dropped so future renders skip them.
+  useEffect(() => {
+    providers.forEach(p => droppedIdsRef.current.add(p.id))
   }, [providers])
 
   // Animated proximity radius: grow from 0 → final on commit
@@ -133,10 +137,6 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
     return () => cancelAnimationFrame(raf)
   }, [proximityKey, reducedMotion]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    isFirstRenderRef.current = false
-  }, [])
-
   return (
     <MapContainer
       center={center}
@@ -157,9 +157,9 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
       <ResizeHandler />
       {providers.map(provider => {
         const isSelected = provider.id === highlightedId || provider.id === selectedId
-        const newcomerIdx = newcomerIndexMap.get(provider.id)
-        const dropOnMount = newcomerIdx !== undefined && !reducedMotion
-        const dropDelayMs = dropOnMount ? Math.min(newcomerIdx, 11) * 30 : 0
+        const newcomerIdxForProvider = newcomerStaggerMap.get(provider.id)
+        const dropOnMount = newcomerIdxForProvider !== undefined && !reducedMotion
+        const dropDelayMs = dropOnMount ? Math.min(newcomerIdxForProvider, 11) * 30 : 0
         return (
         <Marker
           key={provider.id}
