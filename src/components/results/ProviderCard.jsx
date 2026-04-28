@@ -2,6 +2,8 @@ import Badge from '@/components/ui/Badge'
 import { cn, formatDistance, getCategoryLabel } from '@/lib/utils'
 
 export default function ProviderCard({ provider, onHover, onClick, selected, compact = false }) {
+  const addressLine = provider.address.full.split(',')[0].trim()
+
   if (compact) {
     return (
       <button
@@ -10,7 +12,7 @@ export default function ProviderCard({ provider, onHover, onClick, selected, com
       >
         <div className="p-3">
           <h3 className="text-sm font-normal text-primary truncate">{provider.name}</h3>
-          <p className="text-xs text-muted truncate mt-0.5">{provider.type}</p>
+          <p className="text-xs text-muted truncate mt-0.5">{addressLine}</p>
           <div className="flex items-center gap-2 mt-2">
             <Badge variant={provider.category} small>
               {getCategoryLabel(provider.category)}
@@ -37,7 +39,7 @@ export default function ProviderCard({ provider, onHover, onClick, selected, com
       <div className="p-4">
         <div className="mb-1.5">
           <h3 className="text-base font-normal text-primary">{provider.name}</h3>
-          <p className="text-xs text-muted mt-0.5">{provider.type}</p>
+          <p className="text-xs text-muted mt-0.5">{addressLine}</p>
         </div>
 
         <p className="text-sm text-heading line-clamp-2 mb-3 leading-relaxed">
