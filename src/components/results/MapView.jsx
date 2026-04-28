@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet'
 import * as L from 'leaflet'
-import { getCategoryLabel } from '@/lib/utils'
 
 function createMarkerIcon({ isSelected = false, dropDelayMs = 0, dropOnMount = false } = {}) {
   const width = isSelected ? 32 : 26
@@ -168,20 +167,7 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
           eventHandlers={{
             click: () => onMarkerClick?.(provider),
           }}
-        >
-          <Popup>
-            <div className="min-w-[180px]">
-              <p className="font-normal text-sm m-0 mb-1">{provider.name}</p>
-              <p className="text-xs text-gray-500 m-0 mb-2">{getCategoryLabel(provider.category)}</p>
-              <button
-                onClick={() => onMarkerClick?.(provider)}
-                className="text-xs font-normal text-primary hover:underline cursor-pointer"
-              >
-                View details &rarr;
-              </button>
-            </div>
-          </Popup>
-        </Marker>
+        />
       )})}
       {proximityCenter && animatedRadius > 0 && (
         <Circle
