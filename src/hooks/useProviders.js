@@ -4,18 +4,11 @@ import { calculateDistance } from '@/lib/utils'
 
 const PAGE_SIZE = 12
 
-const needsMap = {
-  'talk': ['Emotional support', 'Befriending', 'Counselling', 'Individual counselling', 'Crisis support', 'Peer support groups', 'Social support', 'Community outreach', 'Caregiver support', 'Walk-in sessions'],
-  'therapy': ['CBT', 'Family therapy', 'Couples therapy', 'Art therapy', 'Youth counselling', 'Play therapy', 'Group therapy', 'EMDR', 'Psychotherapy', 'Online therapy', 'Trauma therapy', 'Trauma counselling', 'Grief counselling', 'Child therapy', 'Depression support', 'Anxiety management', 'Resilience building'],
-  'medical': ['Mental health consultation', 'Medication management', 'Specialist referral', 'Health screening', 'Mental health screening', 'GP consultation', 'Referral to psychiatry', 'Mental wellness consultation', 'Anxiety assessment', 'Depression screening', 'Mental health assessment', 'Psychological screening', 'Psychological assessment', 'ADHD assessment', 'Treatment planning'],
-  'wellness': ['Wellness programmes', 'Mindfulness workshops', 'Case management', 'Community integration', 'Group activities', 'Rehabilitation', 'Social integration', 'Vocational training', 'Peer support', 'Stress management'],
-}
-
 export function useProviders(filters) {
   const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
 
-  const filterKey = `${filters.type}|${filters.age}|${filters.sort}|${filters.postal}|${filters.q}|${filters.service}|${filters.openNow}|${filters.fee}|${filters.need}`
+  const filterKey = `${filters.type}|${filters.age}|${filters.sort}|${filters.postal}|${filters.q}|${filters.service}|${filters.openNow}|${filters.fee}`
 
   useEffect(() => { setPage(1) }, [filterKey])
   useEffect(() => {
@@ -57,14 +50,6 @@ export function useProviders(filters) {
       )
     }
 
-    // Need filter (maps to groups of services)
-    if (filters.need && needsMap[filters.need]) {
-      const matchServices = needsMap[filters.need].map(s => s.toLowerCase())
-      result = result.filter(p =>
-        p.services.some(s => matchServices.includes(s.toLowerCase()))
-      )
-    }
-
     // Open now filter
     if (filters.openNow) {
       result = result.filter(p => p.operatingHours.isOpenNow)
@@ -98,7 +83,7 @@ export function useProviders(filters) {
     }
 
     return result
-  }, [filters.type, filters.age, filters.lat, filters.lng, filters.sort, filters.q, filters.service, filters.openNow, filters.fee, filters.need])
+  }, [filters.type, filters.age, filters.lat, filters.lng, filters.sort, filters.q, filters.service, filters.openNow, filters.fee])
 
   // Unique service tags from filtered results (with counts)
   const uniqueServices = useMemo(() => {
@@ -134,13 +119,9 @@ export function useProviders(filters) {
     if (filters.age) base = base.filter(p => p.ageGroups.includes(filters.age))
     if (filters.openNow) base = base.filter(p => p.operatingHours.isOpenNow)
     if (filters.fee) base = base.filter(p => p.fees.toLowerCase() === filters.fee.toLowerCase())
-    if (filters.need && needsMap[filters.need]) {
-      const matchServices = needsMap[filters.need].map(s => s.toLowerCase())
-      base = base.filter(p => p.services.some(s => matchServices.includes(s.toLowerCase())))
-    }
     base.forEach(p => { if (counts[p.category] !== undefined) counts[p.category]++ })
     return counts
-  }, [filters.q, filters.age, filters.openNow, filters.fee, filters.need])
+  }, [filters.q, filters.age, filters.openNow, filters.fee])
 
   const totalCount = filtered.length
   const visibleProviders = filtered.slice(0, page * PAGE_SIZE)

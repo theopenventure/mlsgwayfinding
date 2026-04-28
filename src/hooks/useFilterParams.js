@@ -15,7 +15,6 @@ export function useFilterParams() {
     service: searchParams.get('service') || '',
     openNow: searchParams.get('openNow') === '1',
     fee: searchParams.get('fee') || '',
-    need: searchParams.get('need') || '',
     provider: searchParams.get('provider') || '',
   }
 
@@ -89,7 +88,7 @@ export function useFilterParams() {
     })
   }
 
-  const hasActiveFilters = !!(filters.type || filters.age || filters.postal || filters.q || filters.service || filters.openNow || filters.fee || filters.need)
+  const hasActiveFilters = !!(filters.type || filters.age || filters.postal || filters.q || filters.service || filters.openNow || filters.fee)
 
   return {
     filters,

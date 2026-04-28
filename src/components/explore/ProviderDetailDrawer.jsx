@@ -9,13 +9,18 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
   const initial = provider.name.charAt(0).toUpperCase()
 
   const infoItems = [
-    { label: 'Age groups', value: provider.ageGroups.join(', ') },
-    { label: 'Languages', value: provider.languages.join(', ') },
+    { label: 'Age group', value: provider.ageGroups.join(', ') },
     { label: 'Fees', value: provider.fees },
-    { label: 'Referral needed?', value: provider.referralRequired ? 'Yes' : 'No — walk-in welcome' },
-    { label: 'Weekday hours', value: provider.operatingHours.weekday },
-    { label: 'Saturday', value: provider.operatingHours.saturday },
-    { label: 'Sunday', value: provider.operatingHours.sunday },
+    {
+      label: 'Opening hours',
+      value: (
+        <div className="space-y-1">
+          <div><span className="text-muted">Weekdays:</span> {provider.operatingHours.weekday}</div>
+          <div><span className="text-muted">Saturday:</span> {provider.operatingHours.saturday}</div>
+          <div><span className="text-muted">Sunday:</span> {provider.operatingHours.sunday}</div>
+        </div>
+      ),
+    },
   ]
 
   const badges = (
@@ -57,9 +62,7 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
           <h3 className="text-sm font-normal text-heading mb-2">Services offered</h3>
           <div className="flex flex-wrap gap-2">
             {provider.services.map(service => (
-              <ServiceTag key={service} onClick={() => onServiceClick(service)}>
-                {service}
-              </ServiceTag>
+              <ServiceTag key={service}>{service}</ServiceTag>
             ))}
           </div>
         </section>

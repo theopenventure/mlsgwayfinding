@@ -38,13 +38,18 @@ export default function ProviderDetailPage() {
   const initial = provider.name.charAt(0).toUpperCase()
 
   const infoItems = [
-    { label: 'Age groups served', value: provider.ageGroups.map(a => a === '25+' ? 'Over 25' : a === '18-25' ? '18\u201325' : '12\u201317').join(', ') },
-    { label: 'Languages', value: provider.languages.join(', ') },
+    { label: 'Age group', value: provider.ageGroups.map(a => a === '25+' ? 'Over 25' : a === '18-25' ? '18\u201325' : '12\u201317').join(', ') },
     { label: 'Fees', value: provider.fees },
-    { label: 'Referral needed?', value: provider.referralRequired ? 'Yes' : 'No \u2014 walk-in welcome' },
-    { label: 'Weekday hours', value: provider.operatingHours.weekday },
-    { label: 'Saturday', value: provider.operatingHours.saturday },
-    { label: 'Sunday', value: provider.operatingHours.sunday },
+    {
+      label: 'Opening hours',
+      value: (
+        <div className="space-y-1">
+          <div><span className="text-muted">Weekdays:</span> {provider.operatingHours.weekday}</div>
+          <div><span className="text-muted">Saturday:</span> {provider.operatingHours.saturday}</div>
+          <div><span className="text-muted">Sunday:</span> {provider.operatingHours.sunday}</div>
+        </div>
+      ),
+    },
   ]
 
   return (
