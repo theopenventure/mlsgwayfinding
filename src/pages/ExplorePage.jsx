@@ -33,7 +33,7 @@ export default function ExplorePage() {
   const handleBoundsChange = useCallback((bounds) => setMapBounds(bounds), [])
   const [showAllProviders, setShowAllProviders] = useState(false)
 
-  const activeFilterCount = [filters.type, filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
+  const activeFilterCount = [filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
   const hasPostalFilter = !!(filters.postal && filters.lat && filters.lng)
 
   useEffect(() => {

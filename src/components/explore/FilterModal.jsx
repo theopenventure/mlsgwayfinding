@@ -54,7 +54,7 @@ const feeOptions = [
 
 export default function FilterModal({ open, filters, setFilter, setMultipleFilters, removeFilter, clearAll, totalCount, onClose }) {
   const { shouldRender, isExiting } = useDelayedUnmount(open, 280)
-  const activeFilterCount = [filters.type, filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
+  const activeFilterCount = [filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
 
   const [postalInput, setPostalInput] = useState(filters.postal || '')
   const [postalStatus, setPostalStatus] = useState(
