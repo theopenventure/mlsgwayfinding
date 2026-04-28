@@ -94,29 +94,27 @@ export default function InfoModal({ onClose }) {
             className="absolute top-6 right-6 w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer hover:opacity-90 transition-opacity"
             style={{ border: '1px dashed rgba(0,0,0,0.3)' }}
           >
-            <span className="w-10 h-10 rounded-full bg-[#F1F1F5] text-heading flex items-center justify-center">
+            <span className="w-10 h-10 rounded-full bg-white text-heading flex items-center justify-center">
               <ChevronDown />
             </span>
           </button>
         </div>
 
         {/* Mobile-only text panel */}
-        <div className="md:hidden bg-white px-6 pt-6 pb-8 flex flex-col gap-4">
-          <p className="text-[17px] text-muted tracking-[-0.02em]">{index + 1}/{slides.length}</p>
-          <h2 className="text-[26px] leading-[30px] text-heading font-serif">{slide.title}</h2>
-          <p className="text-[15px] leading-5 text-muted tracking-[-0.02em]">{slide.body}</p>
+        <div className="md:hidden bg-heading text-white px-6 pt-8 pb-10 flex flex-col gap-5">
+          <p className="text-[17px] text-white/70 tracking-[-0.02em]">{index + 1}/{slides.length}</p>
+          <h2 className="text-[26px] leading-[30px] text-[#F1F1F5] font-serif">{slide.title}</h2>
+          <p className="text-[15px] leading-5 text-white/70 tracking-[-0.02em]">{slide.body}</p>
           <div className="flex gap-2 mt-2">
             <NavButton
               direction="prev"
               onClick={() => setIndex(i => Math.max(0, i - 1))}
               disabled={isFirst}
-              dashColor="rgba(0,0,0,0.3)"
             />
             <NavButton
               direction="next"
               onClick={() => setIndex(i => Math.min(slides.length - 1, i + 1))}
               disabled={isLast}
-              dashColor="rgba(0,0,0,0.3)"
             />
           </div>
         </div>
