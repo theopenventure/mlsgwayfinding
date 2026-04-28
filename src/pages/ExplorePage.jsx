@@ -47,7 +47,7 @@ export default function ExplorePage() {
 
   // Drawer enter/exit lifecycle — keep last provider in view during exit
   const drawerOpen = !!selectedProvider
-  const { shouldRender: drawerShouldRender, isExiting: drawerIsExiting } = useDelayedUnmount(drawerOpen, 280)
+  const { shouldRender: drawerShouldRender, isExiting: drawerIsExiting } = useDelayedUnmount(drawerOpen, 240)
   const lastProviderRef = useRef(null)
   useEffect(() => {
     if (selectedProvider) lastProviderRef.current = selectedProvider
@@ -55,7 +55,7 @@ export default function ExplorePage() {
   const drawerProvider = selectedProvider || lastProviderRef.current
 
   // Mobile map overlay enter/exit
-  const { shouldRender: mapOverlayShouldRender, isExiting: mapOverlayIsExiting } = useDelayedUnmount(showMap, 280)
+  const { shouldRender: mapOverlayShouldRender, isExiting: mapOverlayIsExiting } = useDelayedUnmount(showMap, 240)
 
   const relatedProviders = useMemo(() => {
     if (!selectedProvider) return []
@@ -199,18 +199,23 @@ export default function ExplorePage() {
             )}
           </div>
 
-          {/* Right panel: Map (always rendered) with Drawer overlay (desktop) */}
+          {/* Right panel: Map (always mounted) with Drawer overlay (desktop) */}
           <div className="hidden md:block md:w-[42%] py-8 pr-4 sticky top-0 self-start h-[calc(100vh-63px)]">
-            <div className="relative h-full">
-              <MapView
-                providers={mapProviders}
-                highlightedId={hoveredId}
-                selectedId={selectedId}
-                onMarkerClick={handleMarkerClick}
-                onBoundsChange={handleBoundsChange}
-                proximityCenter={hasPostalFilter ? { lat: filters.lat, lng: filters.lng } : null}
-                showAll={showAllProviders || !hasPostalFilter}
-              />
+            <div className="relative h-full bg-white rounded-xl">
+              {/* Map stays mounted but hidden during entry/idle-open so the drawer
+                  doesn't have the map peeking through behind the slide. Reappears
+                  during the drawer's exit so the drawer fades out into the map. */}
+              <div className={cn('h-full', drawerShouldRender && !drawerIsExiting && 'invisible')}>
+                <MapView
+                  providers={mapProviders}
+                  highlightedId={hoveredId}
+                  selectedId={selectedId}
+                  onMarkerClick={handleMarkerClick}
+                  onBoundsChange={handleBoundsChange}
+                  proximityCenter={hasPostalFilter ? { lat: filters.lat, lng: filters.lng } : null}
+                  showAll={showAllProviders || !hasPostalFilter}
+                />
+              </div>
               {drawerShouldRender && drawerProvider && (
                 <div className="absolute inset-0 z-[1100]">
                   <ProviderDetailDrawer

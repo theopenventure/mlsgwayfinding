@@ -49,9 +49,9 @@
   --animate-scale-fade-in: scale-fade-in var(--motion-medium) var(--ease-out-soft);
   --animate-scale-fade-out: scale-fade-out var(--motion-base) var(--ease-out-quick) forwards;
   --animate-sheet-up-in: sheet-up-in var(--motion-slow) var(--ease-out-soft);
-  --animate-sheet-down-out: sheet-down-out var(--motion-medium) var(--ease-out-quick) forwards;
-  --animate-drawer-right-in: drawer-right-in var(--motion-slow) var(--ease-out-soft);
-  --animate-drawer-right-out: drawer-right-out var(--motion-medium) var(--ease-out-quick) forwards;
+  --animate-sheet-down-out: sheet-down-out 240ms var(--ease-out-quick) forwards;
+  --animate-drawer-right-in: drawer-right-in 300ms var(--ease-out-soft);
+  --animate-drawer-right-out: drawer-right-out 240ms var(--ease-out-quick) forwards;
   --animate-card-rise: card-rise var(--motion-medium) var(--ease-out-soft) backwards;
   --animate-shake: shake 200ms ease-in-out;
   --animate-pin-drop: pin-drop var(--motion-medium) var(--ease-out-soft) backwards;
@@ -103,21 +103,23 @@
 }
 
 @keyframes sheet-up-in {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes sheet-down-out {
-  from { transform: translateY(0); }
-  to   { transform: translateY(100%); }
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(100%); }
 }
 
+/* Desktop drawer: short translate combined with fade — avoids the
+   "crawling from the browser edge" feel of a full-width slide. */
 @keyframes drawer-right-in {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from { opacity: 0; transform: translateX(20%); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes drawer-right-out {
-  from { transform: translateX(0); }
-  to   { transform: translateX(100%); }
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(20%); }
 }
 
 @keyframes card-rise {
