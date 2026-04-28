@@ -1,10 +1,27 @@
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+
 export default function FilterChip({ label, onRemove }) {
+  const [isDismissing, setIsDismissing] = useState(false)
+
+  function handleRemove() {
+    if (isDismissing) return
+    setIsDismissing(true)
+    setTimeout(() => onRemove?.(), 200)
+  }
+
   return (
-    <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary-soft text-primary-dark text-sm font-medium">
+    <span
+      data-motion-transform
+      className={cn(
+        'inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary-soft text-primary-dark text-sm font-medium',
+        isDismissing && 'animate-chip-dismiss',
+      )}
+    >
       {label}
       <button
-        onClick={onRemove}
-        className="ml-0.5 w-4 h-4 rounded-full hover:bg-primary/20 flex items-center justify-center transition-colors cursor-pointer"
+        onClick={handleRemove}
+        className="ml-0.5 w-4 h-4 rounded-full hover:bg-primary/20 flex items-center justify-center cursor-pointer motion-hover motion-press motion-focus"
         aria-label={`Remove ${label} filter`}
       >
         <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">

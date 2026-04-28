@@ -1,14 +1,16 @@
 import Badge from '@/components/ui/Badge'
 import { cn, formatDistance, getCategoryLabel } from '@/lib/utils'
 
-export default function ProviderCard({ provider, onHover, onClick, selected, compact = false }) {
+export default function ProviderCard({ provider, onHover, onClick, selected, compact = false, index = 0 }) {
   const addressLine = provider.address.full.split(',')[0].trim()
+  // Stagger first 4 cards; later cards mount instantly to avoid long cascades on scroll
+  const staggerDelay = index < 4 ? `${index * 30}ms` : '0ms'
 
   if (compact) {
     return (
       <button
         onClick={() => onClick?.(provider)}
-        className="flex-shrink-0 w-[240px] rounded-xl bg-white border border-stroke hover:border-stroke transition-all duration-200 overflow-hidden text-left cursor-pointer"
+        className="flex-shrink-0 w-[240px] rounded-xl bg-white border border-stroke hover:border-stroke overflow-hidden text-left cursor-pointer motion-hover motion-press motion-focus"
       >
         <div className="p-3">
           <h3 className="text-sm font-normal text-primary truncate">{provider.name}</h3>
@@ -31,8 +33,10 @@ export default function ProviderCard({ provider, onHover, onClick, selected, com
       onClick={() => onClick?.(provider)}
       onMouseEnter={() => onHover?.(provider.id)}
       onMouseLeave={() => onHover?.(null)}
+      data-motion-transform
+      style={{ animationDelay: staggerDelay }}
       className={cn(
-        'block w-full text-left rounded-xl border transition-all duration-200 overflow-hidden cursor-pointer',
+        'block w-full text-left rounded-xl border overflow-hidden cursor-pointer motion-select motion-press motion-focus animate-card-rise',
         selected ? 'bg-[#F1F1F5] border-transparent hover:border-transparent' : 'bg-white border-stroke hover:border-stroke',
       )}
     >

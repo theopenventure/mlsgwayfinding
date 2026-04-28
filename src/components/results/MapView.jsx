@@ -1,20 +1,35 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet'
 import * as L from 'leaflet'
 import { getCategoryLabel } from '@/lib/utils'
 
-function createMarkerIcon(isSelected = false) {
+function createMarkerIcon({ isSelected = false, dropDelayMs = 0, dropOnMount = false } = {}) {
   const width = isSelected ? 32 : 26
   const height = isSelected ? 46 : 38
+  const haloLayer = isSelected
+    ? `<span aria-hidden="true" style="
+        position: absolute; left: 50%; bottom: 4px;
+        width: 18px; height: 18px;
+        margin-left: -9px;
+        border-radius: 50%;
+        background: rgba(56, 88, 233, 0.45);
+        animation: pin-halo 1800ms ease-out infinite;
+        pointer-events: none;
+      "></span>`
+    : ''
+  const dropClass = dropOnMount ? 'pin-drop-anim' : ''
   return L.divIcon({
     className: 'custom-marker',
-    html: `<div style="
+    html: `<div class="${dropClass}" style="
+      position: relative;
       width: ${width}px; height: ${height}px;
       filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
       transition: transform 200ms ease;
       ${isSelected ? 'transform: scale(1.05);' : ''}
+      animation-delay: ${dropDelayMs}ms;
     ">
-      <svg width="${width}" height="${height}" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+      ${haloLayer}
+      <svg width="${width}" height="${height}" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg" style="position: relative; z-index: 1;">
         <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 24 12 24s12-15 12-24c0-6.627-5.373-12-12-12z" fill="#3858E9" stroke="#FFFFFF" stroke-width="1.5"/>
         <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
       </svg>
@@ -80,6 +95,48 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
     ]
   }, [providers])
 
+  // Track which marker IDs we've already seen so we only pin-drop newcomers
+  const seenIdsRef = useRef(new Set())
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const isFirstRenderRef = useRef(true)
+  const newcomerIndexMap = useMemo(() => {
+    const map = new Map()
+    let newcomerIdx = 0
+    providers.forEach(p => {
+      if (!seenIdsRef.current.has(p.id)) {
+        map.set(p.id, newcomerIdx++)
+      }
+    })
+    // Add to seen for next render
+    providers.forEach(p => seenIdsRef.current.add(p.id))
+    return map
+  }, [providers])
+
+  // Animated proximity radius: grow from 0 → final on commit
+  const [animatedRadius, setAnimatedRadius] = useState(0)
+  const proximityKey = proximityCenter ? `${proximityCenter.lat},${proximityCenter.lng}` : null
+  useEffect(() => {
+    if (!proximityCenter) { setAnimatedRadius(0); return }
+    if (reducedMotion) { setAnimatedRadius(2000); return }
+    const start = performance.now()
+    const duration = 480
+    let raf
+    function tick(now) {
+      const elapsed = now - start
+      const t = Math.min(elapsed / duration, 1)
+      // ease-out-soft approximation
+      const eased = 1 - Math.pow(1 - t, 4)
+      setAnimatedRadius(2000 * eased)
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [proximityKey, reducedMotion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    isFirstRenderRef.current = false
+  }, [])
+
   return (
     <MapContainer
       center={center}
@@ -98,11 +155,16 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
       {!singlePin && <FitBounds providers={providers} proximityCenter={proximityCenter} showAll={showAll} />}
       {!singlePin && onBoundsChange && <BoundsReporter onBoundsChange={onBoundsChange} />}
       <ResizeHandler />
-      {providers.map(provider => (
+      {providers.map(provider => {
+        const isSelected = provider.id === highlightedId || provider.id === selectedId
+        const newcomerIdx = newcomerIndexMap.get(provider.id)
+        const dropOnMount = newcomerIdx !== undefined && !reducedMotion
+        const dropDelayMs = dropOnMount ? Math.min(newcomerIdx, 11) * 30 : 0
+        return (
         <Marker
           key={provider.id}
           position={[provider.address.lat, provider.address.lng]}
-          icon={createMarkerIcon(provider.id === highlightedId || provider.id === selectedId)}
+          icon={createMarkerIcon({ isSelected, dropOnMount, dropDelayMs })}
           eventHandlers={{
             click: () => onMarkerClick?.(provider),
           }}
@@ -120,11 +182,11 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
             </div>
           </Popup>
         </Marker>
-      ))}
-      {proximityCenter && (
+      )})}
+      {proximityCenter && animatedRadius > 0 && (
         <Circle
           center={[proximityCenter.lat, proximityCenter.lng]}
-          radius={2000}
+          radius={animatedRadius}
           pathOptions={{
             color: '#3858E9',
             weight: 2,

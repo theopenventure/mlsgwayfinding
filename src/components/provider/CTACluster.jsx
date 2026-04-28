@@ -58,7 +58,7 @@ export default function CTACluster({ contact, address }) {
             target={action.key === 'website' ? '_blank' : undefined}
             rel={action.key === 'website' ? 'noopener noreferrer' : undefined}
             className={cn(
-              'inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-normal transition-colors',
+              'inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-normal motion-hover motion-press motion-focus',
               action.primary
                 ? 'bg-primary text-white hover:bg-primary-dark'
                 : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]',

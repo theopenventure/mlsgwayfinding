@@ -59,7 +59,7 @@ export default function ProviderDetailPage() {
         <div className="max-w-3xl mx-auto px-4 py-6">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors mb-6 cursor-pointer"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary-dark mb-6 cursor-pointer rounded motion-hover motion-press motion-focus"
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
@@ -70,8 +70,9 @@ export default function ProviderDetailPage() {
           <div className="flex items-start gap-4">
             {/* Avatar */}
             <div
+              data-motion-transform
               className={cn(
-                'w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl md:text-4xl font-bold text-white',
+                'w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl md:text-4xl font-bold text-white animate-avatar-rise',
                 provider.category === 'enquiry-support' ? 'bg-cat-enquiry' :
                 provider.category === 'therapy-counselling' ? 'bg-cat-therapy' :
                 'bg-cat-medical',
@@ -143,7 +144,7 @@ export default function ProviderDetailPage() {
               href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(provider.address.full)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary-dark rounded motion-hover motion-press motion-focus"
             >
               Get directions
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">

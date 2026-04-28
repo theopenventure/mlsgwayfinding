@@ -3,9 +3,9 @@ import CTACluster from '@/components/provider/CTACluster'
 import InfoBlock from '@/components/provider/InfoBlock'
 import ServiceTag from '@/components/provider/ServiceTag'
 import ProviderCard from '@/components/results/ProviderCard'
-import { getCategoryLabel } from '@/lib/utils'
+import { cn, getCategoryLabel } from '@/lib/utils'
 
-export default function ProviderDetailDrawer({ provider, onClose, onServiceClick, onRelatedClick, relatedProviders = [], mobile = false }) {
+export default function ProviderDetailDrawer({ provider, onClose, onServiceClick, onRelatedClick, relatedProviders = [], mobile = false, isExiting = false }) {
   const initial = provider.name.charAt(0).toUpperCase()
 
   const infoItems = [
@@ -33,7 +33,7 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
   )
 
   const closeBtn = (
-    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer motion-hover motion-press motion-focus">
       <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-muted">
         <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
       </svg>
@@ -92,7 +92,13 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
 
   if (mobile) {
     return (
-      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto animate-slide-up">
+      <div
+        data-motion-transform
+        className={cn(
+          'absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto',
+          isExiting ? 'animate-sheet-down-out' : 'animate-sheet-up-in',
+        )}
+      >
         <div className="sticky top-0 bg-white rounded-t-2xl z-10 pt-3 pb-2 px-4">
           <div className="w-10 h-1 rounded-full bg-gray-300 mx-auto mb-3" />
           <div className="flex items-center justify-between">
@@ -108,7 +114,13 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
   }
 
   return (
-    <div className="h-full overflow-y-auto rounded-xl bg-white border border-stroke animate-slide-in-right">
+    <div
+      data-motion-transform
+      className={cn(
+        'h-full overflow-y-auto rounded-xl bg-white border border-stroke',
+        isExiting ? 'animate-drawer-right-out' : 'animate-drawer-right-in',
+      )}
+    >
       <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b border-stroke rounded-t-xl flex items-center justify-between">
         {badges}
         {closeBtn}

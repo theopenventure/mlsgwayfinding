@@ -38,7 +38,7 @@ export default function CategoryTile({ category, count, active, onClick }) {
     <button
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 cursor-pointer text-sm font-medium whitespace-nowrap',
+        'flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm font-medium whitespace-nowrap motion-select motion-press motion-focus',
         active
           ? `${c.activeBg} ${c.activeText} border-transparent shadow-card`
           : `${c.bg} ${c.text} ${c.border} border-opacity-30 hover:shadow-card`,

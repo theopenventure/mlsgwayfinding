@@ -1,6 +1,6 @@
 export default function ProviderCardSkeleton() {
   return (
-    <div className="rounded-xl bg-white shadow-card overflow-hidden animate-pulse">
+    <div className="rounded-xl bg-white shadow-card overflow-hidden motion-skeleton">
       <div className="p-4 flex gap-4">
         <div className="w-14 h-14 rounded-xl bg-gray-200 flex-shrink-0" />
         <div className="flex-1">

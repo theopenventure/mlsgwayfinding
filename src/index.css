@@ -30,6 +30,40 @@
   --animate-fade-in: fade-in 200ms ease-out;
   --animate-slide-in-right: slide-in-right 300ms cubic-bezier(0.22, 1, 0.36, 1);
   --animate-slide-up: slide-up 350ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Motion design system ---- */
+
+  /* Durations */
+  --motion-base: 200ms;
+  --motion-medium: 280ms;
+  --motion-slow: 360ms;
+  --motion-reveal: 480ms;
+
+  /* Easings */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quick: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-micro-spring: cubic-bezier(0.2, 0.9, 0.3, 1.05);
+
+  /* Animation tokens (Tailwind generates animate-* classes) */
+  --animate-scale-fade-in: scale-fade-in var(--motion-medium) var(--ease-out-soft);
+  --animate-scale-fade-out: scale-fade-out var(--motion-base) var(--ease-out-quick) forwards;
+  --animate-sheet-up-in: sheet-up-in var(--motion-slow) var(--ease-out-soft);
+  --animate-sheet-down-out: sheet-down-out var(--motion-medium) var(--ease-out-quick) forwards;
+  --animate-drawer-right-in: drawer-right-in var(--motion-slow) var(--ease-out-soft);
+  --animate-drawer-right-out: drawer-right-out var(--motion-medium) var(--ease-out-quick) forwards;
+  --animate-card-rise: card-rise var(--motion-medium) var(--ease-out-soft) backwards;
+  --animate-shake: shake 200ms ease-in-out;
+  --animate-pin-drop: pin-drop var(--motion-medium) var(--ease-out-soft) backwards;
+  --animate-pin-halo: pin-halo 1800ms ease-out infinite;
+  --animate-avatar-rise: avatar-rise var(--motion-medium) var(--ease-out-soft);
+  --animate-chip-dismiss: chip-dismiss var(--motion-base) var(--ease-out-quick) forwards;
+  --animate-count-fade-in: count-fade-in var(--motion-base) var(--ease-out-soft);
+  --animate-empty-rise: empty-rise 320ms var(--ease-out-soft);
+  --animate-check-pop: check-pop var(--motion-base) var(--ease-out-soft);
+  --animate-fade-out: fade-out var(--motion-base) var(--ease-out-quick) forwards;
+  --animate-carousel-in-left: carousel-in-left var(--motion-medium) var(--ease-out-soft);
+  --animate-carousel-in-right: carousel-in-right var(--motion-medium) var(--ease-out-soft);
 }
 
 @keyframes slide-left {
@@ -57,6 +91,97 @@
   to { transform: translateY(0); }
 }
 
+/* ---- Motion system keyframes ---- */
+
+@keyframes scale-fade-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes scale-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes sheet-up-in {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sheet-down-out {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+@keyframes drawer-right-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes drawer-right-out {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(4px); }
+  50%      { transform: translateX(-4px); }
+  75%      { transform: translateX(2px); }
+}
+
+@keyframes pin-drop {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pin-halo {
+  0%   { opacity: 0.45; transform: scale(1); }
+  80%  { opacity: 0;    transform: scale(1.8); }
+  100% { opacity: 0;    transform: scale(1.8); }
+}
+
+@keyframes avatar-rise {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes chip-dismiss {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes count-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes empty-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes carousel-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes carousel-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes check-pop {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 body {
   margin: 0;
   background-color: var(--color-warm-bg);
@@ -69,6 +194,69 @@ body {
 /* Hide scrollbar for tag rails */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---- Motion system utilities ---- */
+
+/* Hover: animates color/border/shadow at base duration with quick ease */
+.motion-hover {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out-quick);
+}
+
+/* Press: tactile scale-down on :active. Combined with motion-hover for full pattern. */
+.motion-press {
+  transition-property: transform, background-color, border-color, color, box-shadow, opacity;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out-quick);
+}
+.motion-press:active {
+  transform: scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* Focus ring: animates the box-shadow ring fading in */
+.motion-focus {
+  transition: box-shadow var(--motion-base) var(--ease-out-quick);
+  outline: none;
+}
+.motion-focus:focus-visible {
+  box-shadow: 0 0 0 3px rgba(56, 88, 233, 0.32);
+}
+
+/* Selection commit: slower, softer ease for the "click into place" feel */
+.motion-select {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out-soft);
+}
+
+/* Skeleton: calmer pulse than Tailwind default */
+.motion-skeleton {
+  animation: skeleton-pulse 1600ms linear infinite;
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* Pin-drop on Leaflet markers (the divIcon contains a `.pin-drop-anim` div) */
+.pin-drop-anim {
+  animation: pin-drop var(--motion-medium) var(--ease-out-soft) backwards;
+}
+
+/* Reduced motion: kill transforms, keep light opacity transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 100ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-motion-transform] { transform: none !important; }
+  .motion-press:active { transform: none !important; }
+  .motion-skeleton { animation: none !important; }
+}
 
 /* ---- Google-Maps-style Leaflet overrides ---- */
 

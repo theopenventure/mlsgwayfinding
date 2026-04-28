@@ -30,7 +30,7 @@ export default function SelectionCard({ icon, title, subtitle, selected, onClick
     <button
       onClick={onClick}
       className={cn(
-        'relative w-full text-left rounded-xl p-5 transition-all duration-200 cursor-pointer border-2',
+        'relative w-full text-left rounded-xl p-5 cursor-pointer border-2 motion-select motion-press motion-focus',
         'hover:shadow-card-hover',
         selected
           ? 'border-primary bg-primary-soft shadow-card-hover'

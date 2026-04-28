@@ -8,7 +8,7 @@ export default function PillSelector({ options, selected, onChange }) {
           key={option.id}
           onClick={() => onChange(option.id)}
           className={cn(
-            'px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer border-2',
+            'px-6 py-3 rounded-full text-sm font-medium cursor-pointer border-2 motion-select motion-press motion-focus',
             selected === option.id
               ? 'bg-primary text-white border-primary shadow-card-hover'
               : 'bg-white text-heading border-stroke hover:border-primary/50 hover:shadow-card',

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ageGroups } from '@/data/ageGroups'
 import { resolvePostalCode } from '@/data/postalAreas'
 import { cn } from '@/lib/utils'
+import { useDelayedUnmount } from '@/lib/useDelayedUnmount'
 
 const categories = [
   {
@@ -51,7 +52,8 @@ const feeOptions = [
   { id: 'fee-based', label: 'Fee-based', description: 'Standard pricing' },
 ]
 
-export default function FilterModal({ filters, setFilter, setMultipleFilters, removeFilter, clearAll, totalCount, onClose }) {
+export default function FilterModal({ open, filters, setFilter, setMultipleFilters, removeFilter, clearAll, totalCount, onClose }) {
+  const { shouldRender, isExiting } = useDelayedUnmount(open, 280)
   const activeFilterCount = [filters.type, filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
 
   const [postalInput, setPostalInput] = useState(filters.postal || '')
@@ -69,6 +71,23 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
     }
   }, [filters.postal])
 
+  const postalInputRef = useRef(null)
+
+  function shakePostalInput() {
+    if (!postalInputRef.current) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    postalInputRef.current.animate(
+      [
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(4px)' },
+        { transform: 'translateX(-4px)' },
+        { transform: 'translateX(2px)' },
+        { transform: 'translateX(0)' },
+      ],
+      { duration: 200, easing: 'ease-in-out' },
+    )
+  }
+
   function handlePostalChange(value) {
     const digits = value.replace(/\D/g, '').slice(0, 6)
     setPostalInput(digits)
@@ -85,6 +104,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
       setMultipleFilters({ postal: digits, lat: result.lat, lng: result.lng })
     } else {
       setPostalStatus({ type: 'invalid' })
+      shakePostalInput()
     }
   }
 
@@ -94,14 +114,27 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
     removeFilter('location')
   }
 
+  if (!shouldRender) return null
+
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div
+        className={cn('absolute inset-0 bg-black/40', isExiting ? 'animate-fade-out' : 'animate-fade-in')}
+        onClick={onClose}
+      />
 
-      <div className="relative bg-white sm:rounded-2xl rounded-t-2xl border border-stroke w-full sm:max-w-[520px] max-h-[90vh] sm:max-h-[85vh] flex flex-col sm:mx-4 animate-fade-in">
+      <div
+        data-motion-transform
+        className={cn(
+          'relative bg-white sm:rounded-2xl rounded-t-2xl border border-stroke w-full sm:max-w-[520px] max-h-[90vh] sm:max-h-[85vh] flex flex-col sm:mx-4',
+          isExiting
+            ? 'animate-sheet-down-out sm:animate-scale-fade-out'
+            : 'animate-sheet-up-in sm:animate-scale-fade-in',
+        )}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stroke">
-          <button onClick={onClose} className="p-1 cursor-pointer">
+          <button onClick={onClose} className="p-1 cursor-pointer rounded motion-hover motion-press motion-focus">
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-heading">
               <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
             </svg>
@@ -124,7 +157,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
                     key={cat.id || 'all'}
                     onClick={() => setFilter('type', cat.id)}
                     className={cn(
-                      'flex flex-col items-start gap-2 p-4 rounded-xl border transition-all cursor-pointer text-left',
+                      'flex flex-col items-start gap-2 p-4 rounded-xl border cursor-pointer text-left motion-select motion-press motion-focus',
                       isActive
                         ? 'bg-[#F1F1F5] border-transparent'
                         : 'bg-white border-stroke hover:border-stroke',
@@ -156,13 +189,15 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
                 </svg>
               </div>
               <input
+                ref={postalInputRef}
                 type="text"
                 inputMode="numeric"
                 value={postalInput}
                 onChange={(e) => handlePostalChange(e.target.value)}
                 placeholder="e.g. 540121"
+                data-motion-transform
                 className={cn(
-                  'w-full pl-10 pr-10 py-3 rounded-xl border text-sm text-heading placeholder:text-muted/50 outline-none transition-colors',
+                  'w-full pl-10 pr-10 py-3 rounded-xl border text-sm text-heading placeholder:text-muted/50 outline-none motion-select',
                   postalStatus.type === 'invalid'
                     ? 'border-red-400 focus:border-red-500'
                     : postalStatus.type === 'valid'
@@ -173,7 +208,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
               {postalInput && (
                 <button
                   onClick={clearPostal}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 cursor-pointer text-muted hover:text-heading transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 cursor-pointer text-muted hover:text-heading rounded motion-hover motion-press motion-focus"
                 >
                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                     <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -183,9 +218,11 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
             </div>
             {postalStatus.type === 'valid' && (
               <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
-                </svg>
+                <span data-motion-transform className="inline-flex animate-check-pop">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
+                  </svg>
+                </span>
                 Showing results near {postalStatus.label}
               </p>
             )}
@@ -206,7 +243,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
                   key={ag.id}
                   onClick={() => setFilter('age', filters.age === ag.id ? '' : ag.id)}
                   className={cn(
-                    'px-5 py-3 rounded-full text-sm font-normal transition-all cursor-pointer',
+                    'px-5 py-3 rounded-full text-sm font-normal cursor-pointer motion-select motion-press motion-focus',
                     filters.age === ag.id
                       ? 'bg-heading text-white'
                       : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]',
@@ -230,7 +267,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
                   key={fee.id}
                   onClick={() => setFilter('fee', filters.fee === fee.id ? '' : fee.id)}
                   className={cn(
-                    'px-5 py-3 rounded-full text-sm font-normal transition-all cursor-pointer',
+                    'px-5 py-3 rounded-full text-sm font-normal cursor-pointer motion-select motion-press motion-focus',
                     filters.fee === fee.id
                       ? 'bg-heading text-white'
                       : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]',
@@ -253,15 +290,20 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
               </div>
               <button
                 onClick={() => setFilter('openNow', filters.openNow ? '' : true)}
+                style={{ transition: 'background-color var(--motion-base) var(--ease-in-out-soft)' }}
                 className={cn(
-                  'relative flex-shrink-0 w-12 h-7 rounded-full transition-colors cursor-pointer',
+                  'relative flex-shrink-0 w-12 h-7 rounded-full cursor-pointer motion-focus',
                   filters.openNow ? 'bg-primary' : 'bg-gray-300',
                 )}
               >
-                <span className={cn(
-                  'absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-card transition-transform',
-                  filters.openNow ? 'translate-x-[22px]' : 'translate-x-0.5',
-                )} />
+                <span
+                  data-motion-transform
+                  style={{ transition: 'transform 240ms var(--ease-micro-spring)' }}
+                  className={cn(
+                    'absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-card',
+                    filters.openNow ? 'translate-x-[22px]' : 'translate-x-0.5',
+                  )}
+                />
               </button>
             </div>
           </section>
@@ -272,7 +314,7 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
           {activeFilterCount > 0 ? (
             <button
               onClick={clearAll}
-              className="text-sm font-normal text-heading underline underline-offset-2 cursor-pointer hover:text-primary transition-colors"
+              className="text-sm font-normal text-heading underline underline-offset-2 cursor-pointer hover:text-primary motion-hover motion-focus rounded"
             >
               Clear all
             </button>
@@ -281,9 +323,9 @@ export default function FilterModal({ filters, setFilter, setMultipleFilters, re
           )}
           <button
             onClick={onClose}
-            className="px-6 py-3 rounded-full bg-primary text-white text-sm font-normal cursor-pointer hover:bg-primary-dark transition-colors"
+            className="px-6 py-3 rounded-full bg-primary text-white text-sm font-normal cursor-pointer hover:bg-primary-dark motion-hover motion-press motion-focus"
           >
-            Show {totalCount} clinic{totalCount !== 1 ? 's' : ''}
+            Show <span key={totalCount} className="inline-block animate-count-fade-in">{totalCount}</span> clinic{totalCount !== 1 ? 's' : ''}
           </button>
         </div>
       </div>

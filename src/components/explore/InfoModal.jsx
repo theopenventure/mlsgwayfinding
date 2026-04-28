@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { useDelayedUnmount } from '@/lib/useDelayedUnmount'
 
 const slides = [
   {
@@ -49,7 +50,7 @@ function NavButton({ direction, onClick, disabled, dashColor = 'rgba(255,255,255
       disabled={disabled}
       aria-label={direction === 'prev' ? 'Previous slide' : 'Next slide'}
       className={cn(
-        'w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer transition-opacity',
+        'w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer motion-hover motion-press motion-focus',
         disabled ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90',
       )}
       style={{ border: `1px dashed ${dashColor}` }}
@@ -61,28 +62,52 @@ function NavButton({ direction, onClick, disabled, dashColor = 'rgba(255,255,255
   )
 }
 
-export default function InfoModal({ onClose }) {
+export default function InfoModal({ open, onClose }) {
   const [index, setIndex] = useState(0)
+  const { shouldRender, isExiting } = useDelayedUnmount(open, 280)
+  const [direction, setDirection] = useState(1) // +1 = next, -1 = prev — for slide animation
   const slide = slides[index]
   const isFirst = index === 0
   const isLast = index === slides.length - 1
 
   useEffect(() => {
+    if (!open) {
+      // reset to slide 0 after exit completes so reopens start fresh
+      const t = setTimeout(() => setIndex(0), 280)
+      return () => clearTimeout(t)
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
     function onKey(e) {
       if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowLeft' && !isFirst) setIndex(i => i - 1)
-      if (e.key === 'ArrowRight' && !isLast) setIndex(i => i + 1)
+      if (e.key === 'ArrowLeft' && !isFirst) { setDirection(-1); setIndex(i => i - 1) }
+      if (e.key === 'ArrowRight' && !isLast) { setDirection(1); setIndex(i => i + 1) }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isFirst, isLast, onClose])
+  }, [open, isFirst, isLast, onClose])
+
+  if (!shouldRender) return null
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center md:p-6 animate-fade-in">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-[70] flex items-center justify-center md:p-6">
+      <div
+        className={cn('absolute inset-0 bg-black/40', isExiting ? 'animate-fade-out' : 'animate-fade-in')}
+        onClick={onClose}
+      />
 
       {/* Desktop: side-by-side; Mobile: full-screen stacked */}
-      <div className="relative w-full md:w-auto md:max-w-[1044px] h-screen md:h-[540px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row">
+      <div
+        data-motion-transform
+        className={cn(
+          'relative w-full md:w-auto md:max-w-[1044px] h-screen md:h-[540px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row',
+          isExiting
+            ? 'animate-sheet-down-out md:animate-scale-fade-out'
+            : 'animate-sheet-up-in md:animate-scale-fade-in',
+        )}
+      >
         {/* Mobile-only mint top */}
         <div
           className="md:hidden flex-1 relative"
@@ -91,7 +116,7 @@ export default function InfoModal({ onClose }) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-6 right-6 w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer hover:opacity-90 transition-opacity"
+            className="absolute top-6 right-6 w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer hover:opacity-90 motion-hover motion-press motion-focus"
             style={{ border: '1px dashed rgba(0,0,0,0.3)' }}
           >
             <span className="w-10 h-10 rounded-full bg-white text-heading flex items-center justify-center">
@@ -102,18 +127,38 @@ export default function InfoModal({ onClose }) {
 
         {/* Mobile-only text panel */}
         <div className="md:hidden bg-heading text-white px-6 pt-8 pb-10 flex flex-col gap-5">
-          <p className="text-[17px] text-white/70 tracking-[-0.02em]">{index + 1}/{slides.length}</p>
-          <h2 className="text-[26px] leading-[30px] text-[#F1F1F5] font-serif">{slide.title}</h2>
-          <p className="text-[15px] leading-5 text-white/70 tracking-[-0.02em]">{slide.body}</p>
+          <p key={`m-c-${index}`} className="text-[17px] text-white/70 tracking-[-0.02em] animate-count-fade-in">
+            {index + 1}/{slides.length}
+          </p>
+          <h2
+            key={`m-t-${index}`}
+            data-motion-transform
+            className={cn(
+              'text-[26px] leading-[30px] text-[#F1F1F5] font-serif',
+              direction >= 0 ? 'animate-carousel-in-right' : 'animate-carousel-in-left',
+            )}
+          >
+            {slide.title}
+          </h2>
+          <p
+            key={`m-b-${index}`}
+            data-motion-transform
+            className={cn(
+              'text-[15px] leading-5 text-white/70 tracking-[-0.02em]',
+              direction >= 0 ? 'animate-carousel-in-right' : 'animate-carousel-in-left',
+            )}
+          >
+            {slide.body}
+          </p>
           <div className="flex gap-2 mt-2">
             <NavButton
               direction="prev"
-              onClick={() => setIndex(i => Math.max(0, i - 1))}
+              onClick={() => { setDirection(-1); setIndex(i => Math.max(0, i - 1)) }}
               disabled={isFirst}
             />
             <NavButton
               direction="next"
-              onClick={() => setIndex(i => Math.min(slides.length - 1, i + 1))}
+              onClick={() => { setDirection(1); setIndex(i => Math.min(slides.length - 1, i + 1)) }}
               disabled={isLast}
             />
           </div>
@@ -124,8 +169,17 @@ export default function InfoModal({ onClose }) {
           className="hidden md:flex flex-col justify-between bg-heading text-white pl-14 pr-6 py-14 rounded-l-2xl"
           style={{ width: '495px', height: '540px' }}
         >
-          <p className="text-[17px] text-white/70 tracking-[-0.02em]">{index + 1}/{slides.length}</p>
-          <div className="flex flex-col gap-4 max-w-[470px]">
+          <p key={`d-c-${index}`} className="text-[17px] text-white/70 tracking-[-0.02em] animate-count-fade-in">
+            {index + 1}/{slides.length}
+          </p>
+          <div
+            key={`d-tb-${index}`}
+            data-motion-transform
+            className={cn(
+              'flex flex-col gap-4 max-w-[470px]',
+              direction >= 0 ? 'animate-carousel-in-right' : 'animate-carousel-in-left',
+            )}
+          >
             <h2 className="text-[26px] leading-[30px] text-[#F1F1F5] font-serif">{slide.title}</h2>
             <p className="text-[15px] leading-5 text-white/70 tracking-[-0.02em] max-w-[368px]">
               {slide.body}
@@ -134,12 +188,12 @@ export default function InfoModal({ onClose }) {
           <div className="flex gap-2">
             <NavButton
               direction="prev"
-              onClick={() => setIndex(i => Math.max(0, i - 1))}
+              onClick={() => { setDirection(-1); setIndex(i => Math.max(0, i - 1)) }}
               disabled={isFirst}
             />
             <NavButton
               direction="next"
-              onClick={() => setIndex(i => Math.min(slides.length - 1, i + 1))}
+              onClick={() => { setDirection(1); setIndex(i => Math.min(slides.length - 1, i + 1)) }}
               disabled={isLast}
             />
           </div>
@@ -153,7 +207,7 @@ export default function InfoModal({ onClose }) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-14 right-14 w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer hover:opacity-90 transition-opacity"
+            className="absolute top-14 right-14 w-[50px] h-[50px] rounded-full flex items-center justify-center p-[3px] cursor-pointer hover:opacity-90 motion-hover motion-press motion-focus"
             style={{ border: '1px dashed rgba(0,0,0,0.3)' }}
           >
             <span className="w-10 h-10 rounded-full bg-[#F1F1F5] text-heading flex items-center justify-center">
