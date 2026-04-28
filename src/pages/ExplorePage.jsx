@@ -4,6 +4,7 @@ import { useProviders } from '@/hooks/useProviders'
 import { providers as allProvidersData } from '@/data/providers'
 import StickyToolbar from '@/components/explore/StickyToolbar'
 import FilterModal from '@/components/explore/FilterModal'
+import InfoModal from '@/components/explore/InfoModal'
 import UrgencyLane from '@/components/explore/UrgencyLane'
 import ProviderCard from '@/components/results/ProviderCard'
 import ProviderCardSkeleton from '@/components/results/ProviderCardSkeleton'
@@ -25,6 +26,7 @@ export default function ExplorePage() {
   const [hoveredId, setHoveredId] = useState(null)
   const [showMap, setShowMap] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [mapBounds, setMapBounds] = useState(null)
   const handleBoundsChange = useCallback((bounds) => setMapBounds(bounds), [])
   const [showAllProviders, setShowAllProviders] = useState(false)
@@ -99,6 +101,7 @@ export default function ExplorePage() {
         toggleFilter={toggleFilter}
         activeFilterCount={activeFilterCount}
         onOpenFilters={() => setShowFilters(true)}
+        onOpenInfo={() => setShowInfo(true)}
       />
 
       {showFilters && (
@@ -112,6 +115,8 @@ export default function ExplorePage() {
           onClose={() => setShowFilters(false)}
         />
       )}
+
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
 
       <div className="flex-1 overflow-y-auto isolate">
         <div className="flex items-start gap-6 max-w-7xl mx-auto w-full">

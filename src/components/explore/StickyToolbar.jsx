@@ -7,7 +7,7 @@ const categories = [
   { id: 'medical-advice', label: 'Medical Advice' },
 ]
 
-export default function StickyToolbar({ filters, toggleFilter, activeFilterCount, onOpenFilters }) {
+export default function StickyToolbar({ filters, toggleFilter, activeFilterCount, onOpenFilters, onOpenInfo }) {
   return (
     <div className="bg-white border-b border-stroke z-30">
       <div className="max-w-7xl mx-auto px-4 py-3">
@@ -47,6 +47,19 @@ export default function StickyToolbar({ filters, toggleFilter, activeFilterCount
                 </button>
               )
             })}
+
+            {/* Info button */}
+            <button
+              onClick={onOpenInfo}
+              aria-label="About these categories"
+              className="flex-shrink-0 w-11 h-11 rounded-full border border-stroke bg-white flex items-center justify-center text-heading hover:bg-[#F1F1F5] transition-colors cursor-pointer"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <circle cx="12" cy="12" r="9.5" />
+                <line x1="12" y1="11" x2="12" y2="17" />
+                <circle cx="12" cy="7.5" r="0.6" fill="currentColor" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
