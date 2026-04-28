@@ -212,7 +212,7 @@ export default function ExplorePage() {
                 showAll={showAllProviders || !hasPostalFilter}
               />
               {drawerShouldRender && drawerProvider && (
-                <div className="absolute inset-0">
+                <div className="absolute inset-0 z-[1100]">
                   <ProviderDetailDrawer
                     provider={drawerProvider}
                     onClose={closeProvider}
