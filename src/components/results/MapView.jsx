@@ -4,22 +4,24 @@ import * as L from 'leaflet'
 import { getCategoryLabel } from '@/lib/utils'
 
 function createMarkerIcon(isSelected = false) {
-  const size = isSelected ? 34 : 26
-  const border = isSelected ? 4 : 3
+  const width = isSelected ? 32 : 26
+  const height = isSelected ? 46 : 38
   return L.divIcon({
     className: 'custom-marker',
     html: `<div style="
-      width: ${size}px; height: ${size}px;
-      background: #3858E9;
-      border: ${border}px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-      transition: all 200ms ease;
-      ${isSelected ? 'transform: scale(1.15);' : ''}
-    "></div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2],
+      width: ${width}px; height: ${height}px;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+      transition: transform 200ms ease;
+      ${isSelected ? 'transform: scale(1.05);' : ''}
+    ">
+      <svg width="${width}" height="${height}" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 24 12 24s12-15 12-24c0-6.627-5.373-12-12-12z" fill="#3858E9" stroke="#FFFFFF" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+      </svg>
+    </div>`,
+    iconSize: [width, height],
+    iconAnchor: [width / 2, height],
+    popupAnchor: [0, -height + 6],
   })
 }
 
@@ -88,8 +90,10 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
       zoomControl={!singlePin}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={20}
       />
       {!singlePin && <FitBounds providers={providers} proximityCenter={proximityCenter} showAll={showAll} />}
       {!singlePin && onBoundsChange && <BoundsReporter onBoundsChange={onBoundsChange} />}

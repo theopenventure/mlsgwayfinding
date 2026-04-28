@@ -69,3 +69,74 @@ body {
 /* Hide scrollbar for tag rails */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---- Google-Maps-style Leaflet overrides ---- */
+
+/* Tile color tuning — slightly desaturate for a cleaner Google-Maps feel */
+.leaflet-tile-pane {
+  filter: saturate(0.9) contrast(0.98);
+}
+
+/* Popup: rectangular card with soft shadow, no tip */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.3);
+  padding: 4px 0;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-heading);
+}
+.leaflet-popup-tip {
+  box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+}
+.leaflet-popup-close-button {
+  color: #5f6368 !important;
+  font-size: 18px !important;
+  padding: 6px 8px 0 0 !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #202124 !important;
+}
+
+/* Zoom controls — Google-Maps-style square white buttons */
+.leaflet-bar {
+  border: none !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+.leaflet-bar a {
+  background: #ffffff !important;
+  color: #5f6368 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+}
+.leaflet-bar a:last-child {
+  border-bottom: none !important;
+}
+.leaflet-bar a:hover {
+  background: #f1f3f4 !important;
+  color: #202124 !important;
+}
+
+/* Attribution: subtle, smaller — out of the way */
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.85) !important;
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  color: #5f6368 !important;
+}
+.leaflet-control-attribution a {
+  color: #5f6368 !important;
+}
