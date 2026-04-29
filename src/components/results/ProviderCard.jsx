@@ -1,7 +1,7 @@
 import Badge from '@/components/ui/Badge'
 import { cn, formatDistance, getCategoryLabel } from '@/lib/utils'
 
-export default function ProviderCard({ provider, onHover, onClick, selected, compact = false, index = 0 }) {
+export default function ProviderCard({ provider, onHover, onClick, selected, compact = false, index = 0, variant = 'list' }) {
   const addressLine = provider.address.full.split(',')[0].trim()
   // Stagger first 4 cards; later cards mount instantly to avoid long cascades on scroll
   const staggerDelay = index < 4 ? `${index * 30}ms` : '0ms'
@@ -37,7 +37,13 @@ export default function ProviderCard({ provider, onHover, onClick, selected, com
       style={{ animationDelay: staggerDelay }}
       className={cn(
         'block w-full text-left rounded-xl border overflow-hidden cursor-pointer motion-select motion-press motion-focus animate-card-rise',
-        selected ? 'bg-[#F1F1F5] border-transparent hover:border-transparent' : 'bg-white border-stroke hover:border-stroke',
+        variant === 'carousel'
+          ? selected
+            ? 'bg-white border-stroke'
+            : 'bg-[#F1F1F5] border-transparent'
+          : selected
+            ? 'bg-[#F1F1F5] border-transparent hover:border-transparent'
+            : 'bg-white border-stroke hover:border-stroke',
       )}
     >
       <div className="p-4">

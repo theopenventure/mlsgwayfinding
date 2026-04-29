@@ -75,6 +75,7 @@ export default function MapCarousel({ providers, activeId, onActiveChange, onCar
             provider={provider}
             onClick={onCardClick}
             selected={provider.id === activeId}
+            variant="carousel"
           />
         </div>
       ))}
