@@ -55,10 +55,9 @@ export default function MapCarousel({ providers, activeId, onActiveChange, onCar
     <div
       ref={scrollRef}
       onScroll={handleScroll}
-      className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4"
+      className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4 pl-3 pr-3"
       style={{ scrollPaddingInline: '12px' }}
     >
-      <div className="flex-shrink-0 w-3" aria-hidden />
       {providers.map((provider, i) => (
         <div
           key={provider.id}
@@ -79,7 +78,6 @@ export default function MapCarousel({ providers, activeId, onActiveChange, onCar
           />
         </div>
       ))}
-      <div className="flex-shrink-0 w-3" aria-hidden />
     </div>
   )
 }
