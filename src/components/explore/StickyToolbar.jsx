@@ -14,8 +14,8 @@ export default function StickyToolbar({ filters, toggleFilter, activeFilterCount
     : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]'
   return (
     <div className={cn('z-30', floating ? '' : 'bg-white border-b border-stroke')}>
-      <div className={cn('mx-auto', floating ? 'px-3 py-3' : 'max-w-7xl px-4 py-3')}>
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div className={cn(floating ? 'py-3 overflow-x-auto no-scrollbar' : 'mx-auto max-w-7xl px-4 py-3')}>
+        <div className={cn('flex items-center gap-2', floating ? 'px-3' : 'overflow-x-auto no-scrollbar')}>
           {/* Filter button */}
           <button
             onClick={onOpenFilters}
