@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { cn } from '@/lib/utils'
 import ProviderCard from '@/components/results/ProviderCard'
 
 // Horizontal map-overlay carousel. Cards snap to center; the closest card to
@@ -48,6 +49,8 @@ export default function MapCarousel({ providers, activeId, onActiveChange, onCar
 
   if (providers.length === 0) return null
 
+  const isSingle = providers.length === 1
+
   return (
     <div
       ref={scrollRef}
@@ -63,7 +66,10 @@ export default function MapCarousel({ providers, activeId, onActiveChange, onCar
             if (el) cardRefs.current.set(provider.id, el)
             else cardRefs.current.delete(provider.id)
           }}
-          className="flex-shrink-0 w-[82vw] max-w-[340px] snap-center"
+          className={cn(
+            'flex-shrink-0 snap-center',
+            isSingle ? 'w-[calc(100vw-24px)]' : 'w-[82vw] max-w-[340px]',
+          )}
         >
           <ProviderCard
             index={i}

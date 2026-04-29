@@ -143,7 +143,7 @@ export default function MapView({ providers, highlightedId, selectedId, onMarker
       className="w-full h-full rounded-[20px]"
       style={{ minHeight: '300px' }}
       scrollWheelZoom={!singlePin}
-      zoomControl={!singlePin}
+      zoomControl={false}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
