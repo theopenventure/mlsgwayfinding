@@ -68,6 +68,9 @@ export default function StickyToolbar({ filters, toggleFilter, activeFilterCount
                 <circle cx="12" cy="7.5" r="0.6" fill="currentColor" />
             </svg>
           </button>
+          {/* Trailing spacer — scrollable flex containers sometimes drop the
+              inline-end padding, so we use an explicit element. */}
+          {floating && <div className="flex-shrink-0 w-3" aria-hidden />}
         </div>
       </div>
     </div>
