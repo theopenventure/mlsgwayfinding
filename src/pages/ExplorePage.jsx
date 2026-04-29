@@ -7,11 +7,11 @@ import { providers as allProvidersData } from '@/data/providers'
 import StickyToolbar from '@/components/explore/StickyToolbar'
 import FilterModal from '@/components/explore/FilterModal'
 import InfoModal from '@/components/explore/InfoModal'
+import MapCarousel from '@/components/explore/MapCarousel'
 import ProviderCard from '@/components/results/ProviderCard'
 import ProviderCardSkeleton from '@/components/results/ProviderCardSkeleton'
 import MapView from '@/components/results/MapView'
 import EmptyState from '@/components/ui/EmptyState'
-import BottomSheet from '@/components/ui/BottomSheet'
 import ProviderDetailDrawer from '@/components/explore/ProviderDetailDrawer'
 
 export default function ExplorePage() {
@@ -31,7 +31,7 @@ export default function ExplorePage() {
   const [mapBounds, setMapBounds] = useState(null)
   const handleBoundsChange = useCallback((bounds) => setMapBounds(bounds), [])
   const [showAllProviders, setShowAllProviders] = useState(false)
-  const [sheetExpanded, setSheetExpanded] = useState(false)
+  const [mobileActiveId, setMobileActiveId] = useState(null)
 
   const activeFilterCount = [filters.age, filters.fee, filters.openNow, filters.postal].filter(Boolean).length
   const hasPostalFilter = !!(filters.postal && filters.lat && filters.lng)
@@ -80,17 +80,23 @@ export default function ExplorePage() {
     return list.filter(p => mapBounds.contains([p.address.lat, p.address.lng]))
   }, [providers, mapBounds, hasPostalFilter, showAllProviders, top3Providers])
 
+  // Mobile carousel: every provider that's in the current map bounds (no
+  // top-3 pinning, no postal segregation — the map itself is the filter).
+  const mobileCarouselProviders = useMemo(() => {
+    const source = hasPostalFilter && !showAllProviders ? top3Providers : providers
+    if (!mapBounds) return source
+    return source.filter(p => mapBounds.contains([p.address.lat, p.address.lng]))
+  }, [providers, mapBounds, hasPostalFilter, showAllProviders, top3Providers])
+
   const sentinelRef = useRef(null)
-  const mobileSentinelRef = useRef(null)
 
   useEffect(() => {
-    const target = sentinelRef.current || mobileSentinelRef.current
-    if (!target || !hasMore) return
+    if (!sentinelRef.current || !hasMore) return
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) loadMore() },
       { rootMargin: '200px' },
     )
-    observer.observe(target)
+    observer.observe(sentinelRef.current)
     return () => observer.disconnect()
   }, [hasMore, loadMore, visibleProviders.length])
 
@@ -102,16 +108,24 @@ export default function ExplorePage() {
     openProvider(provider.slug)
   }
 
+  // Mobile: tapping a pin scrolls the carousel instead of opening the drawer.
+  function handleMobileMarkerClick(provider) {
+    setMobileActiveId(provider.id)
+  }
+
   function handleServiceClickFromDrawer(serviceName) {
     closeProvider()
     setFilter('service', serviceName)
   }
 
-  // Auto-collapse the list sheet when a provider is opened so the detail
-  // drawer slides up unobstructed.
+  // Reset the carousel-active highlight when the visible set changes (e.g.
+  // user pans far enough that the previously-active card is out of bounds).
   useEffect(() => {
-    if (drawerOpen) setSheetExpanded(false)
-  }, [drawerOpen])
+    if (mobileActiveId == null) return
+    if (!mobileCarouselProviders.some(p => p.id === mobileActiveId)) {
+      setMobileActiveId(null)
+    }
+  }, [mobileCarouselProviders, mobileActiveId])
 
   const listContent = (
     <ListBody
@@ -129,26 +143,6 @@ export default function ExplorePage() {
       hasMore={hasMore}
       sentinelRef={sentinelRef}
       clearAll={clearAll}
-    />
-  )
-
-  const mobileListContent = (
-    <ListBody
-      isLoading={isLoading}
-      totalCount={totalCount}
-      hasPostalFilter={hasPostalFilter}
-      top3Providers={top3Providers}
-      visibleProviders={visibleProviders}
-      showAllProviders={showAllProviders}
-      setShowAllProviders={setShowAllProviders}
-      allProviders={allProviders}
-      filters={filters}
-      onCardClick={handleCardClick}
-      onHover={setHoveredId}
-      hasMore={hasMore}
-      sentinelRef={mobileSentinelRef}
-      clearAll={clearAll}
-      mobile
     />
   )
 
@@ -203,24 +197,24 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      {/* ============ Mobile layout (map-first, Google-Maps style) ============ */}
-      <div className="md:hidden relative h-[100dvh] overflow-hidden bg-white">
-        {/* Map fills the viewport behind everything */}
+      {/* ============ Mobile layout (map-first, cards over map) ============ */}
+      <div className="md:hidden relative h-[100dvh] overflow-hidden">
+        {/* Map fills the viewport */}
         <div className="absolute inset-0 z-0">
           <MapView
             providers={mapProviders}
-            highlightedId={hoveredId}
+            highlightedId={mobileActiveId}
             selectedId={selectedId}
-            onMarkerClick={handleMarkerClick}
+            onMarkerClick={handleMobileMarkerClick}
             onBoundsChange={handleBoundsChange}
             proximityCenter={hasPostalFilter ? { lat: filters.lat, lng: filters.lng } : null}
             showAll={showAllProviders || !hasPostalFilter}
           />
         </div>
 
-        {/* Floating filter toolbar */}
-        <div className="absolute top-0 left-0 right-0 z-30 px-3 pt-3 pointer-events-none">
-          <div className="pointer-events-auto rounded-2xl bg-white/95 backdrop-blur shadow-float">
+        {/* Floating filter pills — straight over the map, horizontally scrollable */}
+        <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none">
+          <div className="pointer-events-auto">
             <StickyToolbar
               filters={filters}
               toggleFilter={toggleFilter}
@@ -232,16 +226,21 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        {/* List bottom sheet — always mounted; detail drawer stacks on top */}
-        <BottomSheet
-          expanded={sheetExpanded}
-          onExpandedChange={setSheetExpanded}
-          className="z-20"
-        >
-          {mobileListContent}
-        </BottomSheet>
+        {/* Card carousel — bottom of the map */}
+        {!drawerShouldRender && (
+          <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+            <div className="pointer-events-auto">
+              <MapCarousel
+                providers={mobileCarouselProviders}
+                activeId={mobileActiveId}
+                onActiveChange={setMobileActiveId}
+                onCardClick={handleCardClick}
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Provider detail sheet — stacks above the list sheet */}
+        {/* Provider detail drawer */}
         {drawerShouldRender && drawerProvider && (
           <div className="absolute inset-0 z-40">
             <div
@@ -284,39 +283,29 @@ export default function ExplorePage() {
 function ListBody({
   isLoading, totalCount, hasPostalFilter, top3Providers, visibleProviders,
   showAllProviders, setShowAllProviders, allProviders, filters,
-  onCardClick, onHover, hasMore, sentinelRef, clearAll, mobile = false,
+  onCardClick, onHover, hasMore, sentinelRef, clearAll,
 }) {
   if (isLoading) {
     return (
-      <div className={cn('grid gap-6 px-4 pb-6', mobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2')}>
-        {Array.from({ length: mobile ? 3 : 6 }, (_, i) => <ProviderCardSkeleton key={i} />)}
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        {Array.from({ length: 6 }, (_, i) => <ProviderCardSkeleton key={i} />)}
       </div>
     )
   }
 
   if (totalCount === 0) {
     return (
-      <div className="px-4 pb-6">
-        <EmptyState
-          title="No services found"
-          message="No services match your current filters. Try adjusting your criteria or show all services."
-          actionLabel="Clear all filters"
-          onAction={clearAll}
-        />
-      </div>
+      <EmptyState
+        title="No services found"
+        message="No services match your current filters. Try adjusting your criteria or show all services."
+        actionLabel="Clear all filters"
+        onAction={clearAll}
+      />
     )
   }
 
   return (
-    <div className={cn('px-4 pb-6', mobile && 'pb-10')}>
-      {mobile && (
-        <div className="pb-3">
-          <p className="text-sm text-muted">
-            {totalCount} {totalCount === 1 ? 'service' : 'services'}
-          </p>
-        </div>
-      )}
-
+    <>
       {hasPostalFilter && top3Providers.length > 0 && (
         <div className="mb-6">
           <div className="grid grid-cols-1 gap-4">
@@ -349,7 +338,7 @@ function ListBody({
       )}
 
       {visibleProviders.length > 0 && (
-        <div className={cn('grid gap-6', mobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2')}>
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
           {visibleProviders.map((provider, i) => (
             <ProviderCard
               key={provider.id}
@@ -364,6 +353,6 @@ function ListBody({
       )}
 
       {hasMore && <div ref={sentinelRef} className="h-10" />}
-    </div>
+    </>
   )
 }
