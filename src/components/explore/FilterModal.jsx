@@ -126,7 +126,7 @@ export default function FilterModal({ open, filters, setFilter, setMultipleFilte
       <div
         data-motion-transform
         className={cn(
-          'relative bg-white sm:rounded-2xl rounded-t-2xl border border-stroke w-full sm:max-w-[520px] max-h-[90dvh] sm:max-h-[85vh] flex flex-col sm:mx-4',
+          'relative bg-white sm:rounded-2xl rounded-t-2xl border border-stroke w-full sm:max-w-[520px] max-h-[85dvh] sm:max-h-[85vh] flex flex-col sm:mx-4',
           isExiting
             ? 'animate-sheet-down-out sm:animate-scale-fade-out'
             : 'animate-sheet-up-in sm:animate-scale-fade-in',

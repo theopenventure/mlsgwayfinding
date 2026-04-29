@@ -9,10 +9,13 @@ const categories = [
 
 export default function StickyToolbar({ filters, toggleFilter, activeFilterCount, onOpenFilters, onOpenInfo, floating = false }) {
   const pillShadow = floating ? 'shadow-card' : ''
+  const inactiveChipClass = floating
+    ? 'bg-white text-heading hover:bg-[#F1F1F5]'
+    : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]'
   return (
     <div className={cn('z-30', floating ? '' : 'bg-white border-b border-stroke')}>
       <div className={cn('mx-auto', floating ? 'px-3 py-3' : 'max-w-7xl px-4 py-3')}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           {/* Filter button */}
           <button
             onClick={onOpenFilters}
@@ -33,42 +36,38 @@ export default function StickyToolbar({ filters, toggleFilter, activeFilterCount
           </button>
 
           {/* Category tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
-            {categories.map(cat => {
-              const isActive = filters.type === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => toggleFilter('type', cat.id)}
-                  className={cn(
-                    'flex-shrink-0 px-5 py-3 rounded-full text-sm font-normal cursor-pointer motion-select motion-press motion-focus',
-                    isActive
-                      ? 'bg-heading text-white'
-                      : 'bg-[#F1F1F5] text-heading hover:bg-[#E5E5EA]',
-                    pillShadow,
-                  )}
-                >
-                  {cat.label}
-                </button>
-              )
-            })}
+          {categories.map(cat => {
+            const isActive = filters.type === cat.id
+            return (
+              <button
+                key={cat.id}
+                onClick={() => toggleFilter('type', cat.id)}
+                className={cn(
+                  'flex-shrink-0 px-5 py-3 rounded-full text-sm font-normal cursor-pointer motion-select motion-press motion-focus',
+                  isActive ? 'bg-heading text-white' : inactiveChipClass,
+                  pillShadow,
+                )}
+              >
+                {cat.label}
+              </button>
+            )
+          })}
 
-            {/* Info button */}
-            <button
-              onClick={onOpenInfo}
-              aria-label="About these categories"
-              className={cn(
-                'flex-shrink-0 w-11 h-11 rounded-full border border-stroke bg-white flex items-center justify-center text-heading hover:bg-[#F1F1F5] cursor-pointer motion-hover motion-press motion-focus',
-                pillShadow,
-              )}
-            >
+          {/* Info button */}
+          <button
+            onClick={onOpenInfo}
+            aria-label="About these categories"
+            className={cn(
+              'flex-shrink-0 w-11 h-11 rounded-full border border-stroke bg-white flex items-center justify-center text-heading hover:bg-[#F1F1F5] cursor-pointer motion-hover motion-press motion-focus',
+              pillShadow,
+            )}
+          >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <circle cx="12" cy="12" r="9.5" />
                 <line x1="12" y1="11" x2="12" y2="17" />
                 <circle cx="12" cy="7.5" r="0.6" fill="currentColor" />
-              </svg>
-            </button>
-          </div>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
