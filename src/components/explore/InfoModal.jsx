@@ -102,7 +102,7 @@ export default function InfoModal({ open, onClose }) {
       <div
         data-motion-transform
         className={cn(
-          'relative w-full md:w-auto md:max-w-[1044px] h-screen md:h-[540px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row',
+          'relative w-full md:w-auto md:max-w-[1044px] h-[100dvh] md:h-[540px] md:rounded-2xl overflow-hidden flex flex-col md:flex-row',
           isExiting
             ? 'animate-sheet-down-out md:animate-scale-fade-out'
             : 'animate-sheet-up-in md:animate-scale-fade-in',

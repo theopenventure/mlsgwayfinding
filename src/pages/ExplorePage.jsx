@@ -109,7 +109,7 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-[100dvh] flex flex-col">
       <StickyToolbar
         filters={filters}
         toggleFilter={toggleFilter}
