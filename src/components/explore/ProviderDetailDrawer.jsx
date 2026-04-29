@@ -95,7 +95,7 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
       <div
         data-motion-transform
         className={cn(
-          'absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto',
+          'absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85dvh] overflow-y-auto',
           isExiting ? 'animate-sheet-down-out' : 'animate-sheet-up-in',
         )}
       >

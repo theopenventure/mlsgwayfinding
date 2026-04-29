@@ -1,4 +1,4 @@
-import { getCategoryLabel, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 const categories = [
   { id: '', label: 'All Services' },
@@ -7,10 +7,10 @@ const categories = [
   { id: 'medical-advice', label: 'Medical Advice' },
 ]
 
-export default function StickyToolbar({ filters, toggleFilter, activeFilterCount, onOpenFilters, onOpenInfo }) {
+export default function StickyToolbar({ filters, toggleFilter, activeFilterCount, onOpenFilters, onOpenInfo, floating = false }) {
   return (
-    <div className="bg-white border-b border-stroke z-30">
-      <div className="max-w-7xl mx-auto px-4 py-3">
+    <div className={cn('z-30', floating ? 'rounded-2xl' : 'bg-white border-b border-stroke')}>
+      <div className={cn('mx-auto', floating ? 'px-2 py-2' : 'max-w-7xl px-4 py-3')}>
         <div className="flex items-center gap-2">
           {/* Filter button */}
           <button
