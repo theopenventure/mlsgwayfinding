@@ -2,10 +2,9 @@ import Badge from '@/components/ui/Badge'
 import CTACluster from '@/components/provider/CTACluster'
 import InfoBlock from '@/components/provider/InfoBlock'
 import ServiceTag from '@/components/provider/ServiceTag'
-import ProviderCard from '@/components/results/ProviderCard'
 import { cn, getCategoryLabel } from '@/lib/utils'
 
-export default function ProviderDetailDrawer({ provider, onClose, onServiceClick, onRelatedClick, relatedProviders = [], mobile = false, isExiting = false }) {
+export default function ProviderDetailDrawer({ provider, onClose, onServiceClick, mobile = false, isExiting = false }) {
   const initial = provider.name.charAt(0).toUpperCase()
 
   const infoItems = [
@@ -76,17 +75,6 @@ export default function ProviderDetailDrawer({ provider, onClose, onServiceClick
         </div>
       </section>
 
-      {/* Related */}
-      {relatedProviders.length > 0 && (
-        <section>
-          <h3 className="text-sm font-normal text-heading mb-2">Similar services</h3>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-            {relatedProviders.map(rp => (
-              <ProviderCard key={rp.id} provider={rp} compact onClick={onRelatedClick} />
-            ))}
-          </div>
-        </section>
-      )}
     </>
   )
 

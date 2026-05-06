@@ -54,13 +54,6 @@ export default function ExplorePage() {
   }, [selectedProvider])
   const drawerProvider = selectedProvider || lastProviderRef.current
 
-  const relatedProviders = useMemo(() => {
-    if (!selectedProvider) return []
-    return allProvidersData
-      .filter(p => p.id !== selectedProvider.id && p.category === selectedProvider.category)
-      .slice(0, 3)
-  }, [selectedProvider])
-
   const selectedId = selectedProvider?.id || null
 
   const top3Providers = useMemo(() => {
@@ -185,8 +178,6 @@ export default function ExplorePage() {
                       provider={drawerProvider}
                       onClose={closeProvider}
                       onServiceClick={handleServiceClickFromDrawer}
-                      onRelatedClick={handleCardClick}
-                      relatedProviders={relatedProviders}
                       isExiting={drawerIsExiting}
                     />
                   </div>
@@ -254,8 +245,6 @@ export default function ExplorePage() {
               provider={drawerProvider}
               onClose={closeProvider}
               onServiceClick={handleServiceClickFromDrawer}
-              onRelatedClick={handleCardClick}
-              relatedProviders={relatedProviders}
               mobile
               isExiting={drawerIsExiting}
             />
